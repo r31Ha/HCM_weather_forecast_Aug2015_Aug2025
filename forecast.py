@@ -6,7 +6,7 @@ from xgboost import XGBRegressor
 import matplotlib.pyplot as plt
 
 # Step 1: Load the dataset
-df = pd.read_csv(r"F:\pypy3\4336502.csv")
+df = pd.read_csv(r"F:\pypy3\hcm-weather-forecast\4336502.csv")
 
 # Step 2: Clean the dataset
 df = df[["DATE", "TAVG"]]
