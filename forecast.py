@@ -22,26 +22,24 @@ df["lag1"] = df["TAVG"].shift(1)
 df["lag2"] = df["TAVG"].shift(2)
 df["lag3"] = df["TAVG"].shift(3)
 
-# NEW: longer lags
+# Longer lags
 df["lag7"]   = df["TAVG"].shift(7)    # same day last week
 df["lag14"]  = df["TAVG"].shift(14)   # two weeks ago
 df["lag365"] = df["TAVG"].shift(365)  # same day last year — captures yearly seasonality
 
 # Rolling averages
 df["rolling_7"]  = df["TAVG"].rolling(window=7).mean()
-df["rolling_30"] = df["TAVG"].rolling(window=30).mean()  # NEW: monthly trend
-
-# NEW: rolling std — captures how volatile/stormy the past week was
+df["rolling_30"] = df["TAVG"].rolling(window=30).mean()
 df["rolling_7_std"] = df["TAVG"].rolling(window=7).std()
 
 # Calendar features
 df["month"]      = df["DATE"].dt.month
-df["dayofyear"]  = df["DATE"].dt.dayofyear  # NEW: 1–365, smoother than month alone
+df["dayofyear"]  = df["DATE"].dt.dayofyear
 
 df = df.dropna().reset_index(drop=True)
 
 print(df.head())
-print(f"Rows after cleanup: {len(df)}")  # will be ~3270 due to lag365
+print(f"Rows after cleanup: {len(df)}")
 
 # Step 4: Split into train/test
 split = int(len(df) * 0.8)
@@ -63,7 +61,7 @@ X_test,  y_test  = test[features],  test[target]
 print(f"Training: {train['DATE'].min().date()} → {train['DATE'].max().date()}  ({len(train)} rows)")
 print(f"Testing:  {test['DATE'].min().date()} → {test['DATE'].max().date()}  ({len(test)} rows)")
 
-# Step 5: Train & Evaluate models — NOW WITH XGBOOST
+# Step 5: Train & Evaluate models
 # Linear Regression
 lr = LinearRegression()
 lr.fit(X_train, y_train)
@@ -74,7 +72,7 @@ rf = RandomForestRegressor(n_estimators=100, random_state=42)
 rf.fit(X_train, y_train)
 rf_preds = rf.predict(X_test)
 
-# NEW: XGBoost
+# XGBoost
 xgb = XGBRegressor(n_estimators=200, learning_rate=0.05, max_depth=4, random_state=42)
 xgb.fit(X_train, y_train)
 xgb_preds = xgb.predict(X_test)
@@ -83,7 +81,7 @@ print(f"\nLinear Regression MAE: {mean_absolute_error(y_test, lr_preds):.2f}°C"
 print(f"Random Forest MAE:     {mean_absolute_error(y_test, rf_preds):.2f}°C")
 print(f"XGBoost MAE:           {mean_absolute_error(y_test, xgb_preds):.2f}°C")
 
-# Step 6: Visualize predictions — NOW WITH XGBOOST
+# Step 6: Visualize predictions
 fig, axes = plt.subplots(2, 1, figsize=(14, 8))
 
 # Plot 1: Full test period
